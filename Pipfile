@@ -9,6 +9,7 @@ requests = "*"
 pytest = "*"
 requests-mock = "*"
 flask-sqlalchemy = "*"
+sqlalchemy-serializer = "*"
 
 [dev-packages]
 
@@ -20,4 +21,3 @@ init_db = "python3 -m flask init-db"
 tests = "pipenv run pytest"
 batch = "pipenv run python scraper/batch.py"
 api = "python3 -m flask run"
-

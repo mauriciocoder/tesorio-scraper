@@ -21,5 +21,5 @@ if __name__ == '__main__':
             repository_file = arg
             print(f'repositories csv file: {repository_file}')
 
-    # github_scraper = GitHubScraper(username, token, repository_file).scrap_repositories_from_file()
+    github_scraper = GitHubScraper(username, token, repository_file).scrap_repositories_from_file()
 
