@@ -3,28 +3,23 @@ from batch_setup import db
 
 from scraper.github_scraper import GitHubScraper
 
-def scrap_repositories(github_scraper):
-    github_scraper.scrap_repositories_from_file()
-
-
 if __name__ == '__main__':
     print('### Starting scraper job')
-    print(f"Arguments count: {len(sys.argv)}")
+    arg_len = len(sys.argv)
+    print(f"Arguments count: {arg_len}")
+    if arg_len <= 1:
+        raise ValueError('You should provide command line parameters in the order: [username, token, repository_file] ')
+    username = token = repository_file = ''
     for i, arg in enumerate(sys.argv):
         if (i == 1):
-            print(f'github username: {arg}')
+            username = arg
+            print(f'github username: {username}')
         if (i == 2):
-            print(f'github token: {arg}')
+            token = arg
+            print(f'github token: {token}')
         if (i == 3):
-            print(f'repositories csv file: {arg}')
+            repository_file = arg
+            print(f'repositories csv file: {repository_file}')
 
-    github_scraper = GitHubScraper(sys.argv[1], sys.argv[2], sys.argv[3])
-    scrap_repositories(github_scraper)
-
-
-    # admin = User(username='admin5', password='admin1')
-    # db.session.add(admin)
-    # db.session.commit()
-    # print(User.query.all())
-
+    # github_scraper = GitHubScraper(username, token, repository_file).scrap_repositories_from_file()
 

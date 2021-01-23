@@ -1,10 +1,11 @@
 import os
 
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
 
 
 def create_app(test_config=None):
-    print('Creating the app in flaskr')
+    print('##### Creating the app in flaskr')
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
@@ -33,5 +34,13 @@ def create_app(test_config=None):
 
     from scraper import db
     db.init_app(app)
+
+    # db_file = 'sqlite:////home/mauricio/dev/project/python/tesorio-scraper/instance/db.sqlite'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + app.config['DATABASE']
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    print(f'SQLALCHEMY_DATABASE_URI: {app.config["SQLALCHEMY_DATABASE_URI"]}')
+    db = SQLAlchemy(app)
+    app.app_context().push()
+    print(f'SQLAlchemy initialization completed')
 
     return app

@@ -27,6 +27,18 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column('id', db.Integer, primary_key=True)
     login = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), unique=True, nullable=True)
+    email = db.Column(db.String(80), unique=True, nullable=True)
+    company = db.Column(db.String(80), unique=True, nullable=True)
+    bio = db.Column(db.String(80), unique=True, nullable=True)
+    location = db.Column(db.String(80), unique=True, nullable=True)
+    html_url = db.Column(db.String(80), unique=True, nullable=True)
+    public_repos = db.Column(db.String(80), unique=True, nullable=True)
+    public_gists = db.Column(db.String(80), unique=True, nullable=True)
+    followers = db.Column(db.String(80), unique=True, nullable=True)
+    following = db.Column(db.String(80), unique=True, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
     repositories = db.relationship('Repository', secondary=RepositoryUser, backref='User')
 
     def __repr__(self):

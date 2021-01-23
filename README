@@ -5,16 +5,19 @@ project layout: https://flask.palletsprojects.com/en/1.1.x/tutorial/layout/
 
 run flask
 
-~/dev/project/python/tesorio-scraper$ export FLASK_APP=flaskr/hello.py
+~/dev/project/python/tesorio-scraper$ export FLASK_APP=flaskr/api.py
 ~/dev/project/python/tesorio-scraper$ export FLASK_ENV=development
 ~/dev/project/python/tesorio-scraper$ flask run
 $ python3 -m flask run -> This should work!!!
+$ pipenv run api
 
 
 
 $ export FLASK_APP=flaskr
 $ python3 -m flask init-db
----> comand from pipFile: $ export FLASK_APP=flaskr & pipenv run init_db
+---> comand from pipFile:
+$ export FLASK_APP=flaskr
+$ pipenv run init_db
 
 Initialized the database.
 There will now be a flaskr.sqlite file in the instance folder in your project.
@@ -48,3 +51,11 @@ pipenv run tests
 ##### my command line to run the batch
 
 pipenv run batch mauriciocoder "git: https://github.com/ on DESKTOP-J52PVQO at 05-Jul-2020 12:00" /home/mauricio/dev/project/python/tesorio-scraper/instance/repositories.csv
+
+
+
+
+RATE_LIMIT
+
+check rate limit
+curl -H "Accept: application/vnd.github.v3+json" --user name:"git: https://github.com/ on DESKTOP-J52PVQO at 05-Jul-2020 12:00" https://api.github.com/rate_limit

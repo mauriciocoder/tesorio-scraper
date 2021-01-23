@@ -2,7 +2,7 @@ import datetime
 
 import requests
 
-from batch_setup import db
+from .batch_setup import db
 from model.github import Repository, User
 
 
@@ -46,7 +46,14 @@ class Scraper:
         :return:
         """
         result = requests.get(url, auth=self.auth).json()
+        print(f'Result before extract attributes: {result}')
         return extract_attributes(result, attributes)
+
+    def custom_get(self, url, meaning):
+        result = requests.get(url, auth=self.auth).json()
+        # print(f'r.request.headers: {result.request.headers}')
+        print(f'{meaning}: {result}')
+
 
 
 class GitHubScraper(Scraper):
@@ -54,11 +61,14 @@ class GitHubScraper(Scraper):
     REPO_ATTRIBUTES = ['id', 'name', 'full_name', 'description', 'language', 'html_url'
         , 'forks', 'created_at', 'updated_at']
     CONTRIBUTORS_ATTRIBUTES = ['login']
-    USER_ATTRIBUTES = ['login']
+    USER_ATTRIBUTES = ['id', 'login']
 
     def __init__(self, user, password, repositories_file_name):
         super(GitHubScraper, self).__init__(user, password)
         self.repositories_file_name = repositories_file_name
+
+    def print_rate_limit(self):
+        self.custom_get(self.BASE_URL, 'Rate limit')
 
     def scrap_repo(self, owner, repo, attributes):
         print(f'Scrapping repo owned by {owner} with name {repo}...')
@@ -67,16 +77,24 @@ class GitHubScraper(Scraper):
         return result
 
     def scrap_contributors(self, owner, repo, attributes):
-        return self.scrap(f'{self.BASE_URL}/repos/{owner}/{repo}/contributors', attributes)
+        print(f'Scrapping contributors from {repo}...')
+        result = self.scrap(f'{self.BASE_URL}/repos/{owner}/{repo}/contributors', attributes)
+        print(f'Result: {result}')
+        return result
 
     def scrap_user(self, username, attributes):
-        return self.scrap(f'{self.BASE_URL}/users/{username}', attributes)
+        print(f'Scrapping user {username}...')
+        result =  self.scrap(f'{self.BASE_URL}/users/{username}', attributes)
+        print(f'Result: {result}')
+        return result
 
     def scrap_repositories_from_file(self):
         # TODO: Unit test this method
-        print('Reading repositories file...')
+        print('$$$$$$$$ Reading repositories file...')
         lines = [line.strip() for line in open(self.repositories_file_name, 'r')]
-        print('Repositories file read.')
+        print('$$$$$$$$ Repositories file read.')
+        print('$$$$$$$$ Checking API rate limit')
+        self.print_rate_limit()
         if lines is not None:
             for i in range(1, len(lines)):
                 # Starts in 1 to avoid the header
@@ -90,21 +108,17 @@ class GitHubScraper(Scraper):
                 repository.updated_at = datetime.datetime.strptime(repository.updated_at, '%Y-%m-%dT%H:%M:%SZ')
 
                 repository.contributors = []
-                print(f'Scrapping {repo} contributors...')
                 contributors_json = self.scrap_contributors(owner, repo, self.CONTRIBUTORS_ATTRIBUTES)
-                print(f'{repo} contributors: {contributors_json}')
                 if contributors_json is not None:
                     for contributor_json in contributors_json:
                         login = contributor_json['login']
-                        print(f'Scrapping user {login}...')
                         user = self.scrap_user(login, self.USER_ATTRIBUTES)
-                        print(f'user {user}')
                         repository.contributors.append(User(**user))
 
-                print('Saving repository to db...')
+                print(f'$$$$$$$$ Saving repository {repo} to db...')
                 db.session.merge(repository)
                 db.session.commit()
-                print('Repository saved')
+                print(f'$$$$$$$$ {repo} saved')
 
 
 if __name__ == '__main__':

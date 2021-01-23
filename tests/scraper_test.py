@@ -1,8 +1,12 @@
+import sys
+
 import pytest
+
 from requests import HTTPError
 
 import scraper.github_scraper as s
 import tests.mock_results as mock
+
 
 
 ### Test extract_attributes function
