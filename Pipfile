@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+requests = "*"
+pytest = "*"
+requests-mock = "*"
+flask-sqlalchemy = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
+
+[scripts]
+init_db = "python3 -m flask init-db"
+tests = "pipenv run pytest"
+batch = "pipenv run python scraper/batch.py"
+
