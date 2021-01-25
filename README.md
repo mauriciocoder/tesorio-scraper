@@ -70,7 +70,6 @@ Before running the batch or exposing the api, the application needs its dependen
     $ pipenv run init_db
     
    Init the app.
-   SQLALCHEMY_DATABASE_URI: sqlite:////home/mauricio/dev/project/python/tmp/tesorio-scraper/instance/db.sqlite
    SQLAlchemy initialization completed
    Initialized the database.
     ```
@@ -91,7 +90,7 @@ bbc,REST-API-example
 
 
 
-1. Run the following commands passing your GitHub user, token and csv_filepath (You can retrieve your access in  [GitHub-Tokens](https://github.com/settings/tokens):
+1. Run the following commands passing your GitHub user, token and csv_filepath (You can retrieve your access in  [GitHub-Tokens](https://github.com/settings/tokens)):
 
     ```sh
     $ export FLASK_APP=flaskr
