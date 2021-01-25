@@ -50,6 +50,7 @@ pipenv run tests
 
 ##### my command line to run the batch
 
+$ export FLASK_APP=flaskr
 pipenv run batch mauriciocoder "git: https://github.com/ on DESKTOP-J52PVQO at 05-Jul-2020 12:00" /home/mauricio/dev/project/python/tesorio-scraper/instance/repositories.csv
 
 
@@ -59,3 +60,12 @@ RATE_LIMIT
 
 check rate limit
 curl -H "Accept: application/vnd.github.v3+json" --user name:"git: https://github.com/ on DESKTOP-J52PVQO at 05-Jul-2020 12:00" https://api.github.com/rate_limit
+
+
+
+
+API_EXAMPLES
+
+http://127.0.0.1:5000/users?login=rubensworks&location=Ghent%2C%20Belgium
+http://127.0.0.1:5000/users?login=rubensworks&location=Ghent%2C%20Belgium&public_repos=173
+http://127.0.0.1:5000/users?public_repos.gte=100
