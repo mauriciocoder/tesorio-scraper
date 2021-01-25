@@ -15,6 +15,32 @@ Tesorio Scraper is a POC application to scrap repositories and users from GitHub
   scraper. It calls external apis and persist data in database
 * API - Endpoints exposing the entities scraped from batch process
 
+
+## Dependencies
+
+From Pipfile:
+
+* `flask` Micro web framework for API. It is classified as a microframework because it does not require particular tools or libraries. It has no database abstraction layer, form validation, or any other components where pre-existing third-party libraries provide common functions.
+* `requests` HTTP request handler. Used for GitHub API calls.
+* `pytest` Python framework for unit testing.
+* `requests-mock` HTTP request mock for GitHub API unit testing.
+* `flask-sqlalchemy` Database ORM and abstraction for SQLite connection.
+* `sqlalchemy-serializer` Serializer for ORM operations.
+
+Plugin presets:
+
+* `@size-limit/preset-app` contains `file` and `time` plugins.
+* `@size-limit/preset-big-lib` contains `webpack`, `file`, and `time` plugins.
+* `@size-limit/preset-small-lib` contains `webpack` and `file` plugins.
+
+[`dual-publish`]: https://github.com/ai/dual-publish
+
+
+
+
+
+
+
 <p align="center">
   <img src="./img/example.png" alt="Size Limit CLI" width="738">
 </p>
