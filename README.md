@@ -13,8 +13,8 @@
 Tesorio Scraper is a POC application to scrap repositories and users from GitHub. It is composed of two modules:
 
 * **Batch** - GitHub Repositories and Users
-  scraper. It calls external apis and persist data in database (SQLite). We are scraping the repositories and its contributors (Users).
-* **API** - Endpoints exposing the entities scraped from batch process
+  scraper. It calls external APIs and persists data in a database (SQLite). We are scraping the repositories and their contributors (Users).
+* **API** - Endpoints exposing the entities scraped from a batch process.
 
 
 ## Dependencies
@@ -39,7 +39,7 @@ Application class diagram:
 
 ### Setup
 
-Before running the batch or exposing the api, the application needs its dependencies installed, DDL script executed (migration) and the units tests passed.
+Before running the batch or exposing the API, the application needs its dependencies installed, DDL script executed (migration) and the unit tests passed.
 
 
 1. Install all dependencies:
@@ -73,14 +73,14 @@ Before running the batch or exposing the api, the application needs its dependen
    SQLAlchemy initialization completed
    Initialized the database.
     ```
-You should now have a the following sqlite file created:
+You should now have the following SQLite file created:
 
 * `./instance/db.sqlite` contains entities User and Repository created.
 
 
 ### Batch Run
 
-The batch process is responsilbe for scraping GitHub data and persist both users and repositories. The batch receives as input the csv file path having all the repositories that we would to scrap data from. Example:
+The batch process is responsible for scraping GitHub data and persist both users and repositories. The batch receives as input the CSV file path having all the repositories that we would scrap data from. Example:
 
 ```sh
 owner,repo
@@ -125,7 +125,7 @@ You should now have your endpoints exposed in the following default port:
 
 ## Endpoints
 
-The REST API endpoints are desribed below.
+The REST API endpoints are described below.
 
 ### Get user by login
 
@@ -228,7 +228,7 @@ You can chain any attribute described in the User's data model in the query stri
 
 
 ### Get users by repository name
-Get users that contributes to a certain repository. This method was created just to show the usage of native sql queries instead of ORM model.
+Get users that contribute to a certain repository. This method was created just to show the usage of native SQL queries instead of the ORM model.
 
 ##### Request
 
