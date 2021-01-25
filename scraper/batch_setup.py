@@ -22,7 +22,6 @@ print(f'Your sys.path: {sys.path}')
 print(f'##### Initializing SQLAlchemy')
 
 app = Flask(__name__)
-/home/mauricio/dev/project/python/tmp/tesorio-scraper
 db_file = f'sqlite:///{root}/instance/db.sqlite'
 app.config['SQLALCHEMY_DATABASE_URI'] = db_file
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
