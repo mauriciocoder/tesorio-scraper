@@ -1,3 +1,4 @@
+
 # Tesorio Scraper 
 
      
@@ -11,9 +12,9 @@
 
 Tesorio Scraper is a POC application to scrap repositories and users from GitHub. It is composed of two modules:
 
-* Batch - GitHub Repositories and Users
-  scraper. It calls external apis and persist data in database
-* API - Endpoints exposing the entities scraped from batch process
+* **Batch** - GitHub Repositories and Users
+  scraper. It calls external apis and persist data in database (SQLite). We are scraping the repositories and its contributors (Users).
+* **API** - Endpoints exposing the entities scraped from batch process
 
 
 ## Dependencies
@@ -27,13 +28,192 @@ From Pipfile:
 * `flask-sqlalchemy` Database ORM and abstraction for SQLite connection.
 * `sqlalchemy-serializer` Serializer for ORM operations.
 
-Plugin presets:
+## Entities
+Application class diagram:
+<p align="center">
+  <img src="https://i.ibb.co/ZcpTsp9/class-diagram.png" alt="Size Limit CLI" width="738">
+</p>
 
-* `@size-limit/preset-app` contains `file` and `time` plugins.
-* `@size-limit/preset-big-lib` contains `webpack`, `file`, and `time` plugins.
-* `@size-limit/preset-small-lib` contains `webpack` and `file` plugins.
 
-[`dual-publish`]: https://github.com/ai/dual-publish
+## Usage
+
+### Setup
+
+Before running the batch or exposing the api, the application needs its dependencies installed, DDL script executed (migration) and the units tests passed.
+
+<details><summary><b>Show instructions</b></summary>
+
+1. Install all dependencies:
+
+    ```sh
+    $ pipenv --rm install
+    ```
+
+2. Run unit tests. All should pass:
+
+    ```sh
+    $ pipenv run tests
+    ```
+3. Run data migration (DDL):
+
+    ```sh
+    $ export FLASK_APP = flaskr
+    $ pipenv run init_db
+    ```
+You should now have a the following sqlite file created:
+
+* `./instance/db.sqlite` contains entities User and Repository created.
+
+
+### Batch Run
+
+The batch process is responsilbe for scraping GitHub data and persist both users and repositories. The batch receives as input the csv file path having all the repositories that we would to scrap data from. Example:
+
+```sh
+owner,repo
+mauriciocoder,tesorio-scraper
+bbc,REST-API-example
+```
+
+<details><summary><b>Show instructions</b></summary>
+
+1. Run the following commands passing your GitHub user, token and csv_filepath (You can retrieve your access in  [GitHub-Tokens](https://github.com/settings/tokens):
+
+    ```sh
+    $ export FLASK_APP = flaskr
+    $ pipenv run batch {github_user} {github_token} {csv_filepath}
+    ```
+
+You should now have your entities persisted in the previously configured database:
+
+* `./instance/db.sqlite` contains entities User and Repository created.
+
+### API Service
+
+Once the batch has completed its execution, we can then expose an API to retrieve user and repository data.
+
+<details><summary><b>Show instructions</b></summary>
+
+1. Run the following commands:
+
+    ```sh
+    $ export FLASK_APP = flaskr
+    $ pipenv run api
+    ```
+
+You should now have your endpoints exposed in the following default port:
+
+* `http://127.0.0.1:5000/` 
+
+## Endpoints
+
+The REST API endpoints are desribed below.
+
+### Get user by login
+
+##### Request
+
+`GET /user/<login>`
+
+    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/user/mauriciocoder
+
+##### Response
+
+    HTTP/1.1 200 OK
+    Date: Thu, 24 Feb 2011 12:36:30 GMT
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 2
+
+    []
+
+### Get users by query string
+You can chain any attribute described in the User's data model in the query string. It will work as filtering by "AND". Also for numeric attributes (Ex. followers, following) you can set the QueryString parameter `followers.gte` or `followers.lte` for greater than or less than.
+
+##### Request
+
+`GET /users`
+
+    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/users?followers.gte=10&followers.lte=10
+
+##### Response
+
+    HTTP/1.1 200 OK
+    Date: Thu, 24 Feb 2011 12:36:30 GMT
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 2
+
+    []
+
+### Get users by repository name
+Get users that contributes to a certain repository. This method was created just to show the usage of native sql queries instead of ORM model.
+
+##### Request
+
+`GET /users/repo/<repo_name>`
+
+    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/users/repo/tesorio-scraper
+
+##### Response
+
+    HTTP/1.1 200 OK
+    Date: Thu, 24 Feb 2011 12:36:30 GMT
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 2
+
+    []
+
+### Get repository by name
+
+##### Request
+
+`GET /repo/<name>`
+
+    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/repo/tesorio-scraper
+
+##### Response
+
+    HTTP/1.1 200 OK
+    Date: Thu, 24 Feb 2011 12:36:30 GMT
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 2
+
+    []
+    
+### Get repositories by query string
+You can chain any attribute described in the Repository data model in the query string. It will work as filtering by "AND". Also for numeric attributes (Ex. followers, following) you can set the QueryString parameter `forks.gte` or `forks.lte` for greater than or less than.
+
+##### Request
+
+`GET /users`
+
+    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/repos?forks.gte=10&forks.lte=10
+
+##### Response
+
+    HTTP/1.1 200 OK
+    Date: Thu, 24 Feb 2011 12:36:30 GMT
+    Status: 200 OK
+    Connection: close
+    Content-Type: application/json
+    Content-Length: 2
+
+    []
+
+
+
+
+
+
+
+
 
 
 
