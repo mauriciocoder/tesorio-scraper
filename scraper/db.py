@@ -6,8 +6,9 @@ from flask.cli import with_appcontext
 
 
 def get_connection():
+    """Get Database connection"""
     if 'db' not in g:
-        click.echo('db not in g!!!')
+        # click.echo('db not in g!!!')
         database = current_app.config['DATABASE']
         g.db = sqlite3.connect(
             current_app.config['DATABASE'],
@@ -19,6 +20,7 @@ def get_connection():
 
 
 def close_db(e=None):
+    """Close Database connection"""
     db = g.pop('db', None)
 
     if db is not None:
@@ -26,6 +28,10 @@ def close_db(e=None):
 
 
 def init_db():
+    """
+    Run the initial DDL migration
+    :return:
+    """
     db = get_connection()
 
     with current_app.open_resource('../migration/scraper-ddl.sql') as f:
@@ -41,6 +47,7 @@ def init_db_command():
 
 
 def init_app(app):
+    """Init application with datbaase setup"""
     click.echo('Init the app.')
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)

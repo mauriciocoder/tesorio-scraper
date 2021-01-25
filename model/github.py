@@ -2,12 +2,16 @@ from datetime import datetime
 from sqlalchemy_serializer import SerializerMixin
 from model.shared_model import db
 
+# join table (Many-to-Many)
 RepositoryUser = db.Table('repository_user',
                           db.Column('repository_id', db.Integer, db.ForeignKey('repository.id')),
                           db.Column('user_id', db.Integer, db.ForeignKey('user.id')))
 
 
 class Repository(db.Model, SerializerMixin):
+    """
+    Github Repository entity
+    """
     __tablename__ = 'repository'
     id = db.Column('id', db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
@@ -25,6 +29,9 @@ class Repository(db.Model, SerializerMixin):
 
 
 class User(db.Model, SerializerMixin):
+    """
+    github User entity
+    """
     __tablename__ = 'user'
     id = db.Column('id', db.Integer, primary_key=True)
     login = db.Column(db.String(80), unique=True, nullable=False)

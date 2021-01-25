@@ -88,13 +88,12 @@ class GitHubScraper(Scraper):
         print(f'Result: {result}')
         return result
 
-    def convert_str_to_datetime(self, obj):
-        # TODO: Find another strategy to map date values (from string to datetime)
+    @staticmethod
+    def convert_str_to_datetime(obj):
         obj.created_at = datetime.datetime.strptime(obj.created_at, '%Y-%m-%dT%H:%M:%SZ')
         obj.updated_at = datetime.datetime.strptime(obj.updated_at, '%Y-%m-%dT%H:%M:%SZ')
 
     def scrap_repositories_from_file(self):
-        # TODO: Unit test this method
         print('$$$$$$$$ Reading repositories file...')
         lines = [line.strip() for line in open(self.repositories_file_name, 'r')]
         print('$$$$$$$$ Repositories file read.')
@@ -121,32 +120,3 @@ class GitHubScraper(Scraper):
                 db.session.merge(repository)
                 db.session.commit()
                 print(f'$$$$$$$$ {repo} saved')
-
-
-if __name__ == '__main__':
-    scraper = Scraper("mauriciocoder", "git: https://github.com/ on DESKTOP-J52PVQO at 05-Jul-2020 12:00")
-    owner = 'octocat'
-    repo = 'hello-world'
-    result = scraper.scrap(f'https://api.github.com/repos/{owner}/{repo}', ['node_id'])
-    print(result)
-
-    result = scraper.scrap(f'https://api.github.com/repos/{owner}/{repo}/contributors', ['id', 'login'])
-    print(result)
-
-    owner = 'twigphp'
-    repo = 'Twig'
-    result = scraper.scrap(f'https://api.github.com/repos/{owner}/{repo}/contributors', ['id', 'login'])
-    print(result)
-
-    username = 'mauriciocoder'
-    g = GitHubScraper("mauriciocoder", "git: https://github.com/ on DESKTOP-J52PVQO at 05-Jul-2020 12:00")
-    result = g.scrap_user(username,
-                          ['id', 'login', 'email', 'bio', 'location', 'public_repos', 'followers', 'created_at',
-                           'updated_at'])
-    # result = g.scrap_users(username, [])
-    print(result)
-
-    owner = 'twigphp'
-    repo = 'Twig'
-    result = scraper.scrap(f'https://api.github.com/repos/{owner}/{repo}/contributors', ['id', 'login'])
-    print(result)

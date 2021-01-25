@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 def create_app(test_config=None):
-    print('##### Creating the app in flaskr')
+    # print('##### Creating the app in flaskr')
 
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)

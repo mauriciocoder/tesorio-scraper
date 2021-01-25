@@ -69,3 +69,9 @@ API_EXAMPLES
 http://127.0.0.1:5000/users?login=rubensworks&location=Ghent%2C%20Belgium
 http://127.0.0.1:5000/users?login=rubensworks&location=Ghent%2C%20Belgium&public_repos=173
 http://127.0.0.1:5000/users?public_repos.gte=100
+
+http://127.0.0.1:5000/users/repo/comunica
+
+
+http://127.0.0.1:5000/repo/comunica
+http://127.0.0.1:5000/repos?forks.gte=10
