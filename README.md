@@ -171,7 +171,7 @@ You can chain any attribute described in the User's data model in the query stri
 
 `GET /users`
 
-    curl 'http://127.0.0.1:5000/users?followers=0&public_repos=6'
+    curl 'http://127.0.0.1:5000/users?followers.gte=10&followers.lte=20&following.gte=10&following.lte=20'
 
 ##### Response
 
@@ -179,29 +179,52 @@ You can chain any attribute described in the User's data model in the query stri
     Content-Type: application/json
     
     [
-      {
-        "bio": null, 
-        "company": null, 
-        "created_at": "2020-07-13 09:26:45", 
-        "email": null, 
-        "followers": "0", 
-        "following": "0", 
-        "html_url": "https://github.com/FlorianFV", 
-        "id": 68223009, 
-        "location": null, 
-        "login": "FlorianFV", 
-        "name": null, 
-        "public_gists": "0", 
-        "public_repos": "6", 
-        "repositories": [
-          {
-            "id": 107345960, 
-            "name": "comunica"
-          }
-        ], 
-        "updated_at": "2020-12-01 10:19:26"
-      }
-    ]
+        {
+          "bio": null, 
+          "company": null, 
+          "created_at": "2011-03-22 16:34:18", 
+          "email": null, 
+          "followers": 12, 
+          "following": 13, 
+          "html_url": "https://github.com/danielbeeke", 
+          "id": 684215, 
+          "location": null, 
+          "login": "danielbeeke", 
+          "name": "Daniel Beeke", 
+          "public_gists": 11, 
+          "public_repos": 130, 
+          "repositories": [
+            {
+              "id": 240760595, 
+              "name": "uhtml"
+            }
+          ], 
+          "updated_at": "2021-01-16 15:21:43"
+        }, 
+        {
+          "bio": null, 
+          "company": "@ZeusWPI ", 
+          "created_at": "2014-10-31 09:42:37", 
+          "email": "wout.schellaert@gmail.com", 
+          "followers": 15, 
+          "following": 16, 
+          "html_url": "https://github.com/wschella", 
+          "id": 9478856, 
+          "location": "Ghent", 
+          "login": "wschella", 
+          "name": "Wout Schellaert", 
+          "public_gists": 0, 
+          "public_repos": 40, 
+          "repositories": [
+            {
+              "id": 107345960, 
+              "name": "comunica"
+            }
+          ], 
+          "updated_at": "2021-01-13 15:36:03"
+        }
+      ]
+
 
 
 ### Get users by repository name
