@@ -41,24 +41,38 @@ Application class diagram:
 
 Before running the batch or exposing the api, the application needs its dependencies installed, DDL script executed (migration) and the units tests passed.
 
-<details><summary><b>Show instructions</b></summary>
 
 1. Install all dependencies:
 
     ```sh
     $ pipenv --rm install
+   
+   ✔ Successfully created virtual environment!
+    Virtualenv location: /home/mauricio/.local/share/virtualenvs/tesorio-scraper-tjk25do1
+    Installing dependencies from Pipfile.lock (12f2da)...
+    ▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉▉ 27/27 — 00:00:06
+    To activate this project's virtualenv, run pipenv shell.
+    Alternatively, run a command inside the virtualenv with pipenv run.
     ```
 
 2. Run unit tests. All should pass:
 
     ```sh
     $ pipenv run tests
+   
+   ...
+   ======================== 8 passed, 9 warnings in 0.33s =========================
     ```
 3. Run data migration (DDL):
 
     ```sh
-    $ export FLASK_APP = flaskr
+    $ export FLASK_APP=flaskr
     $ pipenv run init_db
+    
+   Init the app.
+   SQLALCHEMY_DATABASE_URI: sqlite:////home/mauricio/dev/project/python/tmp/tesorio-scraper/instance/db.sqlite
+   SQLAlchemy initialization completed
+   Initialized the database.
     ```
 You should now have a the following sqlite file created:
 
@@ -75,13 +89,17 @@ mauriciocoder,tesorio-scraper
 bbc,REST-API-example
 ```
 
-<details><summary><b>Show instructions</b></summary>
+
 
 1. Run the following commands passing your GitHub user, token and csv_filepath (You can retrieve your access in  [GitHub-Tokens](https://github.com/settings/tokens):
 
     ```sh
-    $ export FLASK_APP = flaskr
+    $ export FLASK_APP=flaskr
     $ pipenv run batch {github_user} {github_token} {csv_filepath}
+   
+   ...
+   $$$$$$$$ Saving repository bit-of-trust to db...
+   $$$$$$$$ bit-of-trust saved
     ```
 
 You should now have your entities persisted in the previously configured database:
@@ -92,12 +110,13 @@ You should now have your entities persisted in the previously configured databas
 
 Once the batch has completed its execution, we can then expose an API to retrieve user and repository data.
 
-<details><summary><b>Show instructions</b></summary>
+
 
 1. Run the following commands:
 
     ```sh
-    $ export FLASK_APP = flaskr
+    $ export FLASK_APP=flaskr/api.py
+    $ export FLASK_ENV=development
     $ pipenv run api
     ```
 
@@ -115,18 +134,36 @@ The REST API endpoints are desribed below.
 
 `GET /user/<login>`
 
-    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/user/mauriciocoder
+    curl 'http://127.0.0.1:5000/user/wschella'
 
 ##### Response
 
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
-    Status: 200 OK
-    Connection: close
+    HTTP/1.0 200 OK
     Content-Type: application/json
-    Content-Length: 2
+    
+    {
+      "bio": null, 
+      "company": "@ZeusWPI ", 
+      "created_at": "2014-10-31 09:42:37", 
+      "email": null, 
+      "followers": "15", 
+      "following": "16", 
+      "html_url": "https://github.com/wschella", 
+      "id": 9478856, 
+      "location": "Ghent", 
+      "login": "wschella", 
+      "name": "Wout Schellaert", 
+      "public_gists": "0", 
+      "public_repos": "40", 
+      "repositories": [
+        {
+          "id": 107345960, 
+          "name": "comunica"
+        }
+      ], 
+      "updated_at": "2021-01-13 15:36:03"
+    }
 
-    []
 
 ### Get users by query string
 You can chain any attribute described in the User's data model in the query string. It will work as filtering by "AND". Also for numeric attributes (Ex. followers, following) you can set the QueryString parameter `followers.gte` or `followers.lte` for greater than or less than.
@@ -135,18 +172,38 @@ You can chain any attribute described in the User's data model in the query stri
 
 `GET /users`
 
-    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/users?followers.gte=10&followers.lte=10
+    curl 'http://127.0.0.1:5000/users?followers=0&public_repos=6'
 
 ##### Response
 
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
-    Status: 200 OK
-    Connection: close
+    HTTP/1.0 200 OK
     Content-Type: application/json
-    Content-Length: 2
+    
+    [
+      {
+        "bio": null, 
+        "company": null, 
+        "created_at": "2020-07-13 09:26:45", 
+        "email": null, 
+        "followers": "0", 
+        "following": "0", 
+        "html_url": "https://github.com/FlorianFV", 
+        "id": 68223009, 
+        "location": null, 
+        "login": "FlorianFV", 
+        "name": null, 
+        "public_gists": "0", 
+        "public_repos": "6", 
+        "repositories": [
+          {
+            "id": 107345960, 
+            "name": "comunica"
+          }
+        ], 
+        "updated_at": "2020-12-01 10:19:26"
+      }
+    ]
 
-    []
 
 ### Get users by repository name
 Get users that contributes to a certain repository. This method was created just to show the usage of native sql queries instead of ORM model.
@@ -155,18 +212,59 @@ Get users that contributes to a certain repository. This method was created just
 
 `GET /users/repo/<repo_name>`
 
-    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/users/repo/tesorio-scraper
+    curl 'http://127.0.0.1:5000/users/repo/comunica'
 
 ##### Response
 
-    HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
-    Status: 200 OK
-    Connection: close
+    HTTP/1.0 200 OK
     Content-Type: application/json
-    Content-Length: 2
-
-    []
+    
+    [
+        {
+        "bio": "Semantic Web researcher and programming enthusiast", 
+        "company": "IDLab \u2013 Ghent University \u2013 imec", 
+        "created_at": "2010-10-15 06:24:04", 
+        "email": null, 
+        "followers": "127", 
+        "following": "7", 
+        "html_url": "https://github.com/rubensworks", 
+        "id": 440384, 
+        "location": "Ghent, Belgium", 
+        "login": "rubensworks", 
+        "name": "Ruben Taelman", 
+        "public_gists": "15", 
+        "public_repos": "173", 
+        "repositories": [
+          {
+            "id": 107345960, 
+            "name": "comunica"
+          }
+        ], 
+        "updated_at": "2021-01-22 15:27:27"
+      }, 
+      {
+        "bio": null, 
+        "company": "IDLab - UGent - imec", 
+        "created_at": "2013-02-01 09:50:16", 
+        "email": null, 
+        "followers": "17", 
+        "following": "0", 
+        "html_url": "https://github.com/joachimvh", 
+        "id": 3447363, 
+        "location": "Belgium", 
+        "login": "joachimvh", 
+        "name": "Joachim Van Herwegen", 
+        "public_gists": "0", 
+        "public_repos": "15", 
+        "repositories": [
+          {
+            "id": 107345960, 
+            "name": "comunica"
+          }
+        ], 
+        "updated_at": "2021-01-22 15:27:25"
+      }
+    ]
 
 ### Get repository by name
 
@@ -174,507 +272,147 @@ Get users that contributes to a certain repository. This method was created just
 
 `GET /repo/<name>`
 
-    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/repo/tesorio-scraper
+    curl 'http://127.0.0.1:5000/repo/comunica'
 
 ##### Response
 
     HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
-    Status: 200 OK
-    Connection: close
     Content-Type: application/json
-    Content-Length: 2
-
-    []
+    
+        {
+      "contributors": [
+        {
+          "id": 440384, 
+          "login": "rubensworks"
+        }, 
+        {
+          "id": 3447363, 
+          "login": "joachimvh"
+        }, 
+        {
+          "id": 9478856, 
+          "login": "wschella"
+        }, 
+        {
+          "id": 23040076, 
+          "login": "greenkeeper[bot]"
+        }, 
+        {
+          "id": 25180681, 
+          "login": "renovate-bot"
+        }, 
+        {
+          "id": 68223009, 
+          "login": "FlorianFV"
+        }, 
+        {
+          "id": 50518218, 
+          "login": "stephaniech97"
+        }, 
+        {
+          "id": 29139614, 
+          "login": "renovate[bot]"
+        }, 
+        {
+          "id": 17749076, 
+          "login": "BCommeine"
+        }, 
+        {
+          "id": 3322119, 
+          "login": "jacoscaz"
+        }, 
+        {
+          "id": 1032980, 
+          "login": "mielvds"
+        }, 
+        {
+          "id": 675313, 
+          "login": "RubenVerborgh"
+        }, 
+        {
+          "id": 18272282, 
+          "login": "SanderVanhove"
+        }, 
+        {
+          "id": 33571080, 
+          "login": "simonvbrae"
+        }, 
+        {
+          "id": 6189968, 
+          "login": "brechtvdv"
+        }, 
+        {
+          "id": 408412, 
+          "login": "michielbdejong"
+        }, 
+        {
+          "id": 36776018, 
+          "login": "RobinDeBaets"
+        }, 
+        {
+          "id": 15344753, 
+          "login": "tbaccaer"
+        }, 
+        {
+          "id": 4251, 
+          "login": "Vinnl"
+        }
+      ], 
+      "created_at": "2017-10-18 01:57:55", 
+      "description": "\ud83d\udcec A knowledge graph querying framework for JavaScript", 
+      "forks": 28, 
+      "full_name": "comunica/comunica", 
+      "html_url": "https://github.com/comunica/comunica", 
+      "id": 107345960, 
+      "language": "TypeScript", 
+      "name": "comunica", 
+      "updated_at": "2021-01-23 19:53:12"
+    }
     
 ### Get repositories by query string
 You can chain any attribute described in the Repository data model in the query string. It will work as filtering by "AND". Also for numeric attributes (Ex. followers, following) you can set the QueryString parameter `forks.gte` or `forks.lte` for greater than or less than.
 
 ##### Request
 
-`GET /users`
+`GET /repos`
 
-    curl -i -H 'Accept: application/json' http://127.0.0.1:5000/repos?forks.gte=10&forks.lte=10
+    curl 'http://127.0.0.1:5000/repos?language=JavaScript'
 
 ##### Response
 
     HTTP/1.1 200 OK
-    Date: Thu, 24 Feb 2011 12:36:30 GMT
     Status: 200 OK
-    Connection: close
     Content-Type: application/json
-    Content-Length: 2
-
-    []
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<p align="center">
-  <img src="./img/example.png" alt="Size Limit CLI" width="738">
-</p>
-
-With **[GitHub action]** Size Limit will post bundle size changes as a comment
-in pull request discussion.
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/andresz1/size-limit-action/master/assets/pr.png"
-  alt="Size Limit comment in pull request about bundle size changes"
-  width="686" height="289">
-</p>
-
-With `--why`, Size Limit can tell you *why* your library is of this size
-and show the real cost of all your internal dependencies.
-
-<p align="center">
-  <img src="./img/why.png" alt="Bundle Analyzer example" width="650">
-</p>
-
-<p align="center">
-  <a href="https://evilmartians.com/?utm_source=size-limit">
-    <img src="https://evilmartians.com/badges/sponsored-by-evil-martians.svg"
-         alt="Sponsored by Evil Martians" width="236" height="54">
-  </a>
-</p>
-
-[GitHub action]: https://github.com/andresz1/size-limit-action
-[cult-img]:      http://cultofmartians.com/assets/badges/badge.svg
-[cult]:          http://cultofmartians.com/tasks/size-limit-config.html
-
-## Who Uses Size Limit
-
-* [MobX](https://github.com/mobxjs/mobx)
-* [Material-UI](https://github.com/callemall/material-ui)
-* [Autoprefixer](https://github.com/postcss/autoprefixer)
-* [PostCSS](https://github.com/postcss/postcss) reduced
-  [25% of the size](https://github.com/postcss/postcss/commit/150edaa42f6d7ede73d8c72be9909f0a0f87a70f).
-* [Browserslist](https://github.com/ai/browserslist) reduced
-  [25% of the size](https://github.com/ai/browserslist/commit/640b62fa83a20897cae75298a9f2715642531623).
-* [EmojiMart](https://github.com/missive/emoji-mart) reduced
-  [20% of the size](https://github.com/missive/emoji-mart/pull/111)
-* [nanoid](https://github.com/ai/nanoid) reduced
-  [33% of the size](https://github.com/ai/nanoid/commit/036612e7d6cc5760313a8850a2751a5e95184eab).
-* [React Focus Lock](https://github.com/theKashey/react-focus-lock) reduced
-  [32% of the size](https://github.com/theKashey/react-focus-lock/pull/48).
-* [Logux](https://github.com/logux) reduced
-  [90% of the size](https://github.com/logux/logux-client/commit/62b258e20e1818b23ae39b9c4cd49e2495781e91).
-
-
-## How It Works
-
-1. Size Limit contains a CLI tool, 3 plugins (`file`, `webpack`, `time`)
-   and 3 plugin presets for popular use cases (`app`, `big-lib`, `small-lib`).
-   A CLI tool finds plugins in `package.json` and loads the config.
-2. If you use the `webpack` plugin, Size Limit will bundle your JS files into
-   a single file. It is important to track dependencies and webpack polyfills.
-   It is also useful for small libraries with many small files and without
-   a bundler.
-3. The `webpack` plugin creates an empty webpack project, adds your library
-   and looks for the bundle size difference.
-4. The `time` plugin compares the current machine performance with that of
-   a low-priced Android devices to calculate the CPU throttling rate.
-5. Then the `time` plugin runs headless Chrome (or desktop Chrome if it’s
-   available) to track the time a browser takes to compile and execute your JS.
-   Note that these measurements depend on available resources and might
-   be unstable. [See here](https://github.com/mbalabash/estimo/issues/5)
-   for more details.
-
-
-## Usage
-
-### JS Applications
-
-Suitable for applications that have their own bundler and send the JS bundle
-directly to a client (without publishing it to npm). Think of a user-facing app
-or website, like an email client, a CRM, a landing page or a blog with
-interactive elements, using React/Vue/Svelte lib or vanilla JS.
-
-<details><summary><b>Show instructions</b></summary>
-
-1. Install the preset:
-
-    ```sh
-    $ npm install --save-dev size-limit @size-limit/preset-app
-    ```
-
-2. Add the `size-limit` section and the `size` script to your `package.json`:
-
-    ```diff
-    + "size-limit": [
-    +   {
-    +     "path": "dist/app-*.js"
-    +   }
-    + ],
-      "scripts": {
-        "build": "webpack ./webpack.config.js",
-    +   "size": "npm run build && size-limit",
-        "test": "jest && eslint ."
+    
+    [
+      {
+        "contributors": [
+          {
+            "id": 85749, 
+            "login": "WebReflection"
+          }, 
+          {
+            "id": 684215, 
+            "login": "danielbeeke"
+          }
+        ], 
+        "created_at": "2020-02-15 17:45:33", 
+        "description": "A micro HTML/SVG render", 
+        "forks": 9, 
+        "full_name": "WebReflection/uhtml", 
+        "html_url": "https://github.com/WebReflection/uhtml", 
+        "id": 240760595, 
+        "language": "JavaScript", 
+        "name": "uhtml", 
+        "updated_at": "2021-01-22 16:40:19"
       }
-    ```
+    ]
 
-3. Here’s how you can get the size for your current project:
 
-    ```sh
-    $ npm run size
 
-      Package size: 30.08 KB with all dependencies, minified and gzipped
-      Loading time: 602 ms   on slow 3G
-      Running time: 214 ms   on Snapdragon 410
-      Total time:   815 ms
-    ```
 
-4. Now, let’s set the limit. Add 25% to the current total time and use that as
-   the limit in your `package.json`:
 
-    ```diff
-      "size-limit": [
-        {
-    +     "limit": "1 s",
-          "path": "dist/app-*.js"
-        }
-      ],
-    ```
 
-5. Add the `size` script to your test suite:
 
-    ```diff
-      "scripts": {
-        "build": "webpack ./webpack.config.js",
-        "size": "npm run build && size-limit",
-    -   "test": "jest && eslint ."
-    +   "test": "jest && eslint . && npm run size"
-      }
-    ```
 
-6. If you don’t have a continuous integration service running, don’t forget
-   to add one — start with [Travis CI].
 
-</details>
-
-
-### Big Libraries
-
-JS libraries > 10 KB in size.
-
-This preset includes headless Chrome, and will measure your lib’s execution
-time. You likely don’t need this overhead for a small 2 KB lib, but for larger
-ones the execution time is a more accurate and understandable metric that
-the size in bytes. Library like [React] is a good example for this preset.
-
-<details><summary><b>Show instructions</b></summary>
-
-1. Install preset:
-
-    ```sh
-    $ npm install --save-dev size-limit @size-limit/preset-big-lib
-    ```
-
-2. Add the `size-limit` section and the `size` script to your `package.json`:
-
-    ```diff
-    + "size-limit": [
-    +   {
-    +     "path": "dist/react.production-*.js"
-    +   }
-    + ],
-      "scripts": {
-        "build": "webpack ./scripts/rollup/build.js",
-    +   "size": "npm run build && size-limit",
-        "test": "jest && eslint ."
-      }
-    ```
-
-3. If you use ES modules you can test the size after tree-shaking with `import`
-   option:
-
-    ```diff
-      "size-limit": [
-        {
-          "path": "dist/react.production-*.js",
-    +     "import": "{ createComponent }"
-        }
-      ],
-    ```
-
-4. Here’s how you can get the size for your current project:
-
-    ```sh
-    $ npm run size
-
-      Package size: 30.08 KB with all dependencies, minified and gzipped
-      Loading time: 602 ms   on slow 3G
-      Running time: 214 ms   on Snapdragon 410
-      Total time:   815 ms
-    ```
-
-5. Now, let’s set the limit. Add 25% to the current total time and use that
-   as the limit in your `package.json`:
-
-    ```diff
-      "size-limit": [
-        {
-    +     "limit": "1 s",
-          "path": "dist/react.production-*.js"
-        }
-      ],
-    ```
-
-6. Add a `size` script to your test suite:
-
-    ```diff
-      "scripts": {
-        "build": "rollup ./scripts/rollup/build.js",
-        "size": "npm run build && size-limit",
-    -   "test": "jest && eslint ."
-    +   "test": "jest && eslint . && npm run size"
-      }
-    ```
-
-7. If you don’t have a continuous integration service running, don’t forget
-   to add one — start with [Travis CI].
-8. Add the library size to docs, it will help users to choose your project:
-
-    ```diff
-      # Project Name
-
-      Short project description
-
-      * **Fast.** 10% faster than competitor.
-    + * **Small.** 15 KB (minified and gzipped).
-    +   [Size Limit](https://github.com/ai/size-limit) controls the size.
-    ```
-
-</details>
-
-
-### Small Libraries
-
-JS libraries < 10 KB in size.
-
-This preset will only measure the size, without the execution time, so it’s
-suitable for small libraries. If your library is larger, you likely want
-the Big Libraries preset above. [Nano ID] or [Storeon] are good examples
-for this preset.
-
-<details><summary><b>Show instructions</b></summary>
-
-1. First, install `size-limit`:
-
-    ```sh
-    $ npm install --save-dev size-limit @size-limit/preset-small-lib
-    ```
-
-2. Add the `size-limit` section and the `size` script to your `package.json`:
-
-    ```diff
-    + "size-limit": [
-    +   {
-    +     "path": "index.js"
-    +   }
-    + ],
-      "scripts": {
-    +   "size": "size-limit",
-        "test": "jest && eslint ."
-      }
-    ```
-
-3. Here’s how you can get the size for your current project:
-
-    ```sh
-    $ npm run size
-
-      Package size: 177 B with all dependencies, minified and gzipped
-    ```
-
-4. If your project size starts to look bloated, run `--why` for analysis:
-
-    ```sh
-    $ npm run size -- --why
-    ```
-
-5. Now, let’s set the limit. Determine the current size of your library,
-   add just a little bit (a kilobyte, maybe) and use that as the limit
-   in your `package.json`:
-
-    ```diff
-     "size-limit": [
-        {
-    +     "limit": "9 KB",
-          "path": "index.js"
-        }
-     ],
-    ```
-
-6. Add the `size` script to your test suite:
-
-    ```diff
-      "scripts": {
-        "size": "size-limit",
-    -   "test": "jest && eslint ."
-    +   "test": "jest && eslint . && npm run size"
-      }
-    ```
-
-7. If you don’t have a continuous integration service running, don’t forget
-   to add one — start with [Travis CI].
-8. Add the library size to docs, it will help users to choose your project:
-
-    ```diff
-      # Project Name
-
-      Short project description
-
-      * **Fast.** 10% faster than competitor.
-    + * **Small.** 500 bytes (minified and gzipped). No dependencies.
-    +   [Size Limit](https://github.com/ai/size-limit) controls the size.
-    ```
-
-</details>
-
-[Travis CI]: https://github.com/dwyl/learn-travis
-[Storeon]: https://github.com/ai/storeon/
-[Nano ID]: https://github.com/ai/nanoid/
-[React]: https://github.com/facebook/react/
-
-
-## Reports
-
-Size Limit has a [GitHub action] that comments and rejects pull requests based
-on Size Limit output.
-
-1. Install and configure Size Limit as shown above.
-2. Add the following action inside `.github/workflows/size-limit.yml`
-
-```yaml
-name: "size"
-on:
-  pull_request:
-    branches:
-      - master
-jobs:
-  size:
-    runs-on: ubuntu-latest
-    env:
-      CI_JOB_NUMBER: 1
-    steps:
-      - uses: actions/checkout@v1
-      - uses: andresz1/size-limit-action@v1.0.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-```
-
-
-## Config
-
-Size Limits supports three ways to define config.
-
-1. `size-limit` section in `package.json`:
-
-   ```json
-     "size-limit": [
-       {
-         "path": "index.js",
-         "import": "{ createStore }",
-         "limit": "500 ms"
-       }
-     ]
-   ```
-
-2. or a separate `.size-limit.json` config file:
-
-   ```js
-   [
-     {
-       "path": "index.js",
-       "import": "{ createStore }",
-       "limit": "500 ms"
-     }
-   ]
-   ```
-
-3. or a more flexible `.size-limit.js` config file:
-
-   ```js
-   module.exports = [
-     {
-       path: "index.js",
-       import: "{ createStore }",
-       limit: "500 ms"
-     }
-   ]
-   ```
-
-Each section in the config can have these options:
-
-* **path**: relative paths to files. The only mandatory option.
-  It could be a path `"index.js"`, a [pattern] `"dist/app-*.js"`
-  or an array `["index.js", "dist/app-*.js", "!dist/app-exclude.js"]`.
-* **import**: partial import to test tree-shaking. It could be `"{ lib }"`
-  to test `import { lib } from 'lib'` or `{ "a.js": "{ a }", "b.js": "{ b }" }`
-  to test multiple files.
-* **limit**: size or time limit for files from the `path` option. It should be
-  a string with a number and unit, separated by a space.
-  Format: `100 B`, `10 KB`, `500 ms`, `1 s`.
-* **name**: the name of the current section. It will only be useful
-  if you have multiple sections.
-* **entry**: when using a custom webpack config, a webpack entry could be given.
-  It could be a string or an array of strings.
-  By default, the total size of all entry points will be checked.
-* **webpack**: with `false` it will disable webpack.
-* **running**: with `false` it will disable calculating running time.
-* **gzip**: with `false` it will disable gzip compression.
-* **brotli**: with `true` it will use brotli compression and disable gzip compression.
-* **config**: a path to a custom webpack config.
-* **ignore**: an array of files and dependencies to exclude from
-  the project size calculation.
-
-If you use Size Limit to track the size of CSS files, make sure to set
-`webpack: false`. Otherwise, you will get wrong numbers, because webpack
-inserts `style-loader` runtime (≈2 KB) into the bundle.
-
-[pattern]: https://github.com/sindresorhus/globby#globbing-patterns
-
-
-## Plugins and Presets
-
-Plugins:
-
-* `@size-limit/file` checks the size of files with Gzip, Brotli
-  or without compression.
-* `@size-limit/webpack` adds your library to empty webpack project
-  and prepares bundle file for `file` plugin.
-* `@size-limit/time` uses headless Chrome to track time to execute JS.
-* `@size-limit/dual-publish` compiles files to ES modules with [`dual-publish`]
-  to check size after tree-shaking.
-
-Plugin presets:
-
-* `@size-limit/preset-app` contains `file` and `time` plugins.
-* `@size-limit/preset-big-lib` contains `webpack`, `file`, and `time` plugins.
-* `@size-limit/preset-small-lib` contains `webpack` and `file` plugins.
-
-[`dual-publish`]: https://github.com/ai/dual-publish
-
-
-## JS API
-
-```js
-const sizeLimit = require('size-limit')
-const filePlugin = require('@size-limit/file')
-const webpackPlugin = require('@size-limit/webpack')
-
-sizeLimit([filePlugin, webpackPlugin], [filePath]).then(result => {
-  result //=> { size: 12480 }
-})
-```
