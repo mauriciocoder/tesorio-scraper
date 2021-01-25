@@ -5,7 +5,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 from pathlib import Path
-sys.path.append(str(Path('.').absolute()))
+root = str(Path('.').absolute())
+sys.path.append(root)
 
 welcome = """
  _____                     _         __                                
@@ -21,7 +22,8 @@ print(f'Your sys.path: {sys.path}')
 print(f'##### Initializing SQLAlchemy')
 
 app = Flask(__name__)
-db_file = 'sqlite:////home/mauricio/dev/project/python/tesorio-scraper/instance/db.sqlite'
+/home/mauricio/dev/project/python/tmp/tesorio-scraper
+db_file = f'sqlite:///{root}/instance/db.sqlite'
 app.config['SQLALCHEMY_DATABASE_URI'] = db_file
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 print(f'SQLALCHEMY_DATABASE_URI: {db_file}')
